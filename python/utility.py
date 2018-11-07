@@ -91,7 +91,6 @@ def decrypt_file_as_df(filepath, skey):
     return pd.read_csv(StringIO(data))
 
 
-
 # data = 'Hello Python';
 # print(compute_sha256_hash(data))
 
@@ -102,7 +101,7 @@ def decrypt_file_as_df(filepath, skey):
 data = 'Python'
 encrypted_data, key = encrypt_data(data)
 
-print((encrypted_data))
+print(type(encrypted_data))
 print((key))
 
 # decrypted_data = decrypt_data(encrypted_data, key)

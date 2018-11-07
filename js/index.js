@@ -33,8 +33,8 @@ const encrypt_data = (data) => {
 }
 
 const encrypt_json_data = (json_data) => {
-  const { encrypted_data, key } = encrypt_data(json_data);
-  return { encrypted_data, key };
+  const { encrypted_data, key, nonce64 } = encrypt_data(json_data);
+  return { encrypted_data, key, nonce64 };
 }
 
 const decrypt_data = (box, key, nonce64) => {
@@ -53,13 +53,46 @@ const decrypt_data = (box, key, nonce64) => {
 }
 
 
-let data = "Python";
-const { encrypted_data, key, nonce64 } = encrypt_data(data);
-//
-// console.log(encrypted_data);
-const decrypted_data = decrypt_data(encrypted_data, key, nonce64);
+const encrypt_file = async (filepath, sKey) => {
+  const data = await FileIO.read_data(filepath);
+  const key = crypto.createHash('sha256').update(sKey).digest();
+  const nonceBuff = crypto.randomBytes(24);
+  const nonce64 = nonceBuff.toString('base64');
+  const messageBuff = Buffer.from(data);
 
-console.log(decrypted_data);
+  const box = nacl.secretbox(messageBuff, nonceBuff, key);
+  const encrypted_data = Buffer.from(box).toString('hex');
+  const encrypted_file_path = compute_sha256_hash(encrypted_data) + '.enc';
+
+  FileIO.write_data(encrypted_file_path, encrypted_data);
+  return { encrypted_file_path, data: compute_sha256_hash(data), encrypted_data: compute_sha256_hash(encrypted_data), nonce64 };
+}
+
+
+const decrypt_file = async (filePath, skey, nonce64) => {
+  const encrypted_data = await FileIO.read_data(filepath);
+  const key = crypto.createHash('sha256').update(skey).digest();
+  const nonceBuffer = Buffer.from(nonce64, 'base64');
+
+  try {
+    const box = nacl.secretbox.open(encrypted_data, nonceBuffer, keyBuffer);
+    const decrypted_data = Buffer.from(box).toString('hex');
+    return { decrypted_data, compute_sha256_hash(decrypted_data), compute_sha256_hash(encrypted_data) };
+  } catch (e) {
+    console.log("Error in decrypt_file", e);
+    return false;
+  }
+}
+
+// encrypt_file('file.txt', '123');
+
+// let data = "Python";
+// const { encrypted_data, key, nonce64 } = encrypt_data(data);
+// //
+// // console.log(encrypted_data);
+// const decrypted_data = decrypt_data(encrypted_data, key, nonce64);
+//
+// console.log(decrypted_data);
 // console.log((encrypted_data));
 // console.log((key));
 // const new_data = util.encodeUTF8(encrypted_data);

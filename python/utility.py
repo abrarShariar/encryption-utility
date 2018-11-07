@@ -48,8 +48,9 @@ def encrypt_file(filepath, skey):
     with open(filepath, "rb") as fileRead:
         data = fileRead.read()
 
+    print(skey)
     key = sha256(str.encode(skey)).digest()
-    #print str(key)
+    # print(key)
 
     hashFunction = nacl.secret.SecretBox(key)
     Rnonc = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
@@ -93,16 +94,16 @@ def decrypt_file_as_df(filepath, skey):
 
 # data = 'Hello Python';
 # print(compute_sha256_hash(data))
-
+encrypt_file('file.txt', '123')
 # test_data = 'Hello World'
 # print(compute_sha256_hash(test_data))
 # print(compute_sha256_hash_file('file.txt'))
 
-data = 'Python'
-encrypted_data, key = encrypt_data(data)
-
-print(type(encrypted_data))
-print((key))
+# data = 'Python'
+# encrypted_data, key = encrypt_data(data)
+#
+# print(type(encrypted_data))
+# print((key))
 
 # decrypted_data = decrypt_data(encrypted_data, key)
 # print(decrypted_data)
